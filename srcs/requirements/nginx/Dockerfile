@@ -1,12 +1,16 @@
 FROM alpine:3.20
 
-RUN apk add --no-cache nginx openssl
+RUN set -x apk add --no-cache nginx openssl
 
-COPY nginx-default.config /nginx-default.conf
-COPY nginx-entrypoint.sh /nginx-entrypoint.sh
+COPY ./config/nginx-default.config /nginx-default.conf
+COPY ./tools/nginx-entrypoint.sh /nginx-entrypoint.sh
 
 RUN chmod +x /nginx-entrypoint.sh
 
-EXPOSE 80 443
+STOPSIGNAL SIGQUIT
+
+EXPOSE 443
 
 ENTRYPOINT ["/nginx-entrypoint.sh"]
+
+CMD ["nginx", "-g", "daemon off;"]
