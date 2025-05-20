@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  mariadb:
+    build: ./requirements/mariadb/
+    restart: on-failure
+    ports:
+      - 3306:3306
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/mysql
+
+    wordpress:
+    
+  nginx:
+    build: ./requirements/nginx/
+    restart: on-failure
+    ports:
+      - "433:433"
+    volumes:
+      -wordpress_data:/var/www/html
+    depends_on:
+      -wordpress
+
+
+  volumes:
+      db_data:
+        driver: local
+        driver_opts:
+          type: none
+          device: /home/rbarbier/data/db
+          o: bind
+
+      db_wordpress:
+        driver: local
+        driver_opts:
+          type: none
+          device: /home/rbarbier/data/wordpress
+          o:bind
+
+  networks:
+    default:
+      driver: bridge
+
+
+
+       
