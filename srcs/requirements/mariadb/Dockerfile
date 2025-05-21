@@ -10,9 +10,7 @@ COPY mariadb-entrypoint.sh /mariadb-entrypoint.sh
 RUN chmod +x /mariadb-entrypoint.sh
 
 VOLUME ["/var/lib/mysql"]
-
 EXPOSE 3306
-
 ENTRYPOINT ["/mariadb-entrypoint.sh"]
 
 CMD ["mysqld", "--defaults-file=/etc/mariadb-default.cnf"]
