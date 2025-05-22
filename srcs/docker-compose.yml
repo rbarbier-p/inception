@@ -3,7 +3,8 @@ services:
   mariadb:
     build: ./requirements/mariadb/
     restart: on-failure
-    env_file: .env
+    env_file: 
+      - .env
     ports:
       - 3306:3306
     volumes:
@@ -12,7 +13,8 @@ services:
   wordpress:
     build: ./requirements/wordpress/
     restart: on-failure
-    env_file: .env
+    env_file:
+      - .env
     volumes: 
       - wordpress_data:/var/www/html
     depends_on: 
@@ -29,23 +31,13 @@ services:
       - wordpress
 
 
-  volumes:
+volumes:
+    db_data:
+    wordpress_data:
 
-      db_data:
-        driver_opts:
-          type: 'none'
-          device: /home/rbarbier/data/db
-          o: bind
-
-      wordpress_data:
-        driver_opts:
-          type: 'none'
-          device: /home/rbarbier/data/wordpress
-          o: bind
-
-  networks:
-    default:
-      driver: bridge
+networks:
+  default:
+    driver: bridge
 
 
 

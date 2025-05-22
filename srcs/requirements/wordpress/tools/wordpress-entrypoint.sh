@@ -2,7 +2,7 @@
 
 set -e
 
-if ["$1"='php-fpm83']; then
+if [ "$1" = "php-fpm83" ]; then
 	
 	while ! nc -z mariadb 3306; do
 		echo "WordPress:Waiting for MariaDB..."
@@ -10,7 +10,7 @@ if ["$1"='php-fpm83']; then
 	done
 
 	config="/var/www/html/wp-config.php"
-	if [!-f"$config"]; then
+	if [ ! -f "$config" ]; then
 		echo "WordPress:Configuring WordPress..."
 
 		curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
@@ -43,11 +43,9 @@ if ["$1"='php-fpm83']; then
 			--user_pass="$WORDPRESS_DB_PASSWORD" \
 			--allow-root
 
-		chwon -R www-data:www-data /var/www/html
-
+		chown -R www-data:www-data /var/www/html
 	fi
 
+fi
+
 exec "$@"
-		
-
-
