@@ -50,6 +50,8 @@ download_wp()
 		tar -xzf wp.tar.gz --strip-components=1
 		rm -f wp.tar.gz
 		echo "Wordpress installed!"
+	else 
+		echo "Wordpress already installed."
 	fi
 }
 
@@ -59,8 +61,12 @@ init_wp()
 	group_create
 	php_conf
 	download_wp
-	mv /wp-config.php /var/www/html/
-	tail -f /dev/null
+
+	if [ -f /wp-config.php ]; then
+		mv /wp-config.php /var/www/html/
+	fi
+
+	exec php-fpm83 -F
 }
 
 if [ "$1" = "php-fpm83" ]; then	

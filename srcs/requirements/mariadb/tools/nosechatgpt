@@ -1,0 +1,68 @@
+#!/bin/sh
+
+set -e
+
+mysql_config_file() {
+echo "Copying configuration file"
+cat << EOF > /etc/my.cnf
+[mysqld]
+user=mysql
+datadir=${MYSQL_DATADIR:-/var/lib/mysql}
+port=3306
+bind-address=0.0.0.0
+socket=/run/mysqld/mysqld.sock
+EOF
+}
+
+start_database() {
+echo "Creating Database"
+if [ -d "${MYSQL_DATADIR}/mysql" ]; then
+echo "Database already initialized, starting MariaDB..."
+else
+mysql_install_db --user=mysql --datadir=${MYSQL_DATADIR} > /dev/null 2>&1
+mysqld --defaults-file=/etc/my.cnf &
+while ! mysqladmin ping --silent; do
+echo "Waiting for MariaDB..."
+sleep 1
+done
+create_database
+# import init script as socket-authenticated root user
+mysql --socket=/run/mysqld/mysqld.sock < ${MYSQL_DATADIR}/init-db.sql
+mysqladmin shutdown --socket=/run/mysqld/mysqld.sock
+fi
+echo "Database Created!"
+}
+
+create_database() {
+cat << EOF > ${MYSQL_DATADIR}/init-db.sql
+-- create application database and user
+CREATE DATABASE IF NOT EXISTS `${MARIADB_DATABASE}`;
+CREATE USER IF NOT EXISTS '${MARIADB_USER}'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON `${MARIADB_DATABASE}`.* TO '${MARIADB_USER}'@'%';
+FLUSH PRIVILEGES;
+EOF
+}
+
+add_group() {
+if ! getent group "mysql" > /dev/null 2>&1; then
+addgroup -S mysql
+fi
+if ! getent passwd "mysql" > /dev/null 2>&1; then
+adduser -S -D -H -s /sbin/nologin -g mysql mysql
+fi
+chown -R mysql:mysql ${MYSQL_DATADIR}
+echo "Group and user added!"
+}
+
+init_mdb() {
+add_group
+mysql_config_file
+start_database
+exec su-exec mysql "$@"
+}
+
+if [ "$1" = "mysqld" ]; then
+init_mdb "$@"
+else
+exec "$@"
+fi
