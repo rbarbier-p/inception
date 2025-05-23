@@ -1,6 +1,7 @@
 services:
 
   mariadb:
+    container_name: mariadb
     build: ./requirements/mariadb/
     restart: on-failure
     env_file: 
@@ -8,37 +9,30 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - db_data:/var/lib/mysql
+      - ${DB_VOLUME_DIR}:/var/lib/mysql
 
   wordpress:
+    container_name: wordpress
     build: ./requirements/wordpress/
     restart: on-failure
     env_file:
       - .env
     volumes: 
-      - wordpress_data:/var/www/html
+      - ${WP_VOLUME_DIR}:/var/www/html
     depends_on: 
       - mariadb
     
   nginx:
+    container_name: nginx
     build: ./requirements/nginx/
     restart: on-failure
     ports:
       - 433:433
     volumes:
-      - wordpress_data:/var/www/html
+      - ${WP_VOLUME_DIR}:/var/www/html
     depends_on:
       - wordpress
-
-
-volumes:
-    db_data:
-    wordpress_data:
 
 networks:
   default:
     driver: bridge
-
-
-
-       

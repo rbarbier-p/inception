@@ -10,8 +10,6 @@ COPY ./tools/mariadb-entrypoint.sh /mariadb-entrypoint.sh
 
 RUN chmod +x /mariadb-entrypoint.sh
 
-#VOLUME ["/var/lib/mysql"]
-EXPOSE 3306
 ENTRYPOINT ["/mariadb-entrypoint.sh"]
-
+EXPOSE 3306
 CMD ["mysqld", "--user=mysql"]
