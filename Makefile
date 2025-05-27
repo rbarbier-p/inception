@@ -6,8 +6,6 @@ VOLUME_PATH=/home/$(USERNAME)/data
 all: up
 
 up:
-	@mkdir -p $(VOLUME_PATH)/db
-	@mkdir -p $(VOLUME_PATH)/wordpress
 	@echo "Starting containers..."
 	@$(COMPOSE) up --build -d
 
@@ -18,6 +16,7 @@ down:
 prune: fclean
 	@echo "Removing everything..."
 	@docker system prune --all --force --volumes
+	@docker image prune -a -f
 
 re: down up
 

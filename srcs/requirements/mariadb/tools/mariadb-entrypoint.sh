@@ -17,17 +17,14 @@ EOF
 
 start_database()
 {
-	#function=start_database
 
 	echo "Creating Database"
 	if [ -d "/var/lib/mysql/mysql" ]; then
 		echo "Database already initialized, starting MariaDB..."
 	else
 
-	mysql_install_db --user=mysql --datadir=/var/lib/mysql > /dev/null 2>&1
-
+	mysql_install_db --user=mysql --datadir=/var/lib/mysql 
 	mysqld --datadir=/var/lib/mysql &
-
 	while ! mysqladmin ping --silent; do
 	    echo "Waiting for Mariadb..."
 	    sleep 1
@@ -35,8 +32,8 @@ start_database()
 
 	create_database
 
-	#mysql -u root -p"$db_root_password" < /var/lib/mysql/init-db.sql > /dev/null 2>&1
-	#mysqladmin shutdown -u root -p"$db_root_password"
+	mysql -u root -p"$db_root_password" < /var/lib/mysql/init-db.sql > /dev/null 2>&1
+	mysqladmin shutdown -u root -p"$db_root_password"
 fi
 
 echo "Database Created!"
@@ -59,13 +56,19 @@ create_database()
 	#$(cat $db_root_password_file)
 
 cat << EOF > /var/lib/mysql/init-db.sql
-	ALTER USER 'root'@'localhost' IDENTIFIED BY "$db_root_password";
 	CREATE DATABASE IF NOT EXISTS \`${MARIADB_DATABASE}\`;
+	ALTER USER 'root'@'localhost' IDENTIFIED BY "$db_root_password";
+	GRANT ALL PRIVILEGES ON \`${MARIADB_DATABASE}\`.* TO "root"@"localhost";
+	
 	CREATE USER IF NOT EXISTS "${MARIADB_USER}"@"%" IDENTIFIED BY "$db_password";
 	GRANT ALL PRIVILEGES ON \`${MARIADB_DATABASE}\`.* TO "${MARIADB_USER}"@"%";
 	FLUSH PRIVILEGES;
 EOF
 
+	echo \`${MARIADB_DATABASE}\`
+	echo "${MARIADB_DATABASE}"
+	echo \`${MARIADB_USER}\`
+	echo "${MARIADB_USER}"
 	#else
 	#	error "$db_password_file or $db_root_password_file not found..."
 	#fi
@@ -83,14 +86,13 @@ add_group()
 
 	chown -R mysql:mysql /var/lib/mysql
 
-	echo "Grups and users added!"
+	echo "Groups and users added!"
 }
 
 if [ "$1" = "mysqld" ]; then
 	add_group
 	mysql_config_file
 	start_database
-	#tail -f > /dev/null 
 	exec su-exec mysql $@
 else
 	exec "$@"
