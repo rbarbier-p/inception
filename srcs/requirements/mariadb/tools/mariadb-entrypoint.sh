@@ -64,11 +64,6 @@ cat << EOF > /var/lib/mysql/init-db.sql
 	GRANT ALL PRIVILEGES ON \`${MARIADB_DATABASE}\`.* TO "${MARIADB_USER}"@"%";
 	FLUSH PRIVILEGES;
 EOF
-
-	echo \`${MARIADB_DATABASE}\`
-	echo "${MARIADB_DATABASE}"
-	echo \`${MARIADB_USER}\`
-	echo "${MARIADB_USER}"
 	#else
 	#	error "$db_password_file or $db_root_password_file not found..."
 	#fi

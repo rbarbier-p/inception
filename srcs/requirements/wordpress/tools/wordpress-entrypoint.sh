@@ -55,6 +55,40 @@ download_wp()
 	fi
 }
 
+users_create()
+{
+
+	WP="php -d memory_limit=256M /usr/local/bin/wp --path=/var/www/html"
+	if ! $WP core is-installed >/dev/null 2>&1; then
+		echo " it hasnt been configured yet"
+
+		curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+		chmod +x wp-cli.phar
+		mv wp-cli.phar /usr/local/bin/wp
+
+		echo "moving wp done"
+
+		$WP core install \
+			--url="$DOMAIN_NAME" \
+			--title="$WORDPRESS_TITLE" \
+			--admin_user="$WORDPRESS_ADMIN_USER" \
+			--admin_password="$WORDPRESS_ADMIN_PASSWORD" \
+			--admin_email="$WORDPRESS_ADMIN_EMAIL" \
+			--skip-email \
+			--allow-root
+		echo "core install"
+
+		$WP user create \
+			"$WORDPRESS_DB_USER" "$WORDPRESS_USER_EMAIL" \
+			--role=author \
+			--user_pass="$WORDPRESS_DB_PASSWORD" \
+			--allow-root
+		echo "user create"
+	else
+		echo "already initiated"
+	fi
+}
+
 init_wp()
 {
 	loop_mariadb
@@ -65,6 +99,8 @@ init_wp()
 	if [ -f /wp-config.php ]; then
 		mv /wp-config.php /var/www/html/
 	fi
+
+	users_create
 
 	exec php-fpm83 -F
 }

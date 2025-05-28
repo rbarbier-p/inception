@@ -29,6 +29,7 @@ services:
     restart: on-failure
     ports:
       - 443:443
+      - 80:80
     volumes:
       - ${WP_VOLUME_DIR}:/var/www/html
 
