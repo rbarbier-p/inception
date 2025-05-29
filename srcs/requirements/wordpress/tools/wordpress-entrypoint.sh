@@ -66,8 +66,6 @@ users_create()
 		chmod +x wp-cli.phar
 		mv wp-cli.phar /usr/local/bin/wp
 
-		echo "moving wp done"
-
 		$WP core install \
 			--url="$DOMAIN_NAME" \
 			--title="$WORDPRESS_TITLE" \
@@ -76,14 +74,12 @@ users_create()
 			--admin_email="$WORDPRESS_ADMIN_EMAIL" \
 			--skip-email \
 			--allow-root
-		echo "core install"
 
 		$WP user create \
 			"$WORDPRESS_DB_USER" "$WORDPRESS_USER_EMAIL" \
 			--role=author \
 			--user_pass="$WORDPRESS_DB_PASSWORD" \
 			--allow-root
-		echo "user create"
 	else
 		echo "already initiated"
 	fi

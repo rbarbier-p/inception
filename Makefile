@@ -16,15 +16,14 @@ down:
 prune: fclean
 	@echo "Removing everything..."
 	@docker system prune --all --force --volumes
-	@docker image prune -a -f
 
 re: down up
 
 fclean:
-	@echo "Full cleanup: volumes, containers, networks..."
+	@echo "Full cleanup: containers, networks..."
 	@$(COMPOSE) down -v --remove-orphans
-	@docker volume rm $(shell docker volume ls -qf dangling=true) 2>/dev/null || true
 	@docker rmi $(shell docker images -q --filter=reference='*inception*') 2>/dev/null || true
+	@docker image prune -a -f
 
 clean: down
 

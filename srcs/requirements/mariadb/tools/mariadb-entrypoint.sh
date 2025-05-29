@@ -60,6 +60,8 @@ cat << EOF > /var/lib/mysql/init-db.sql
 	ALTER USER 'root'@'localhost' IDENTIFIED BY "$db_root_password";
 	GRANT ALL PRIVILEGES ON \`${MARIADB_DATABASE}\`.* TO "root"@"localhost";
 	
+	CREATE USER IF NOT EXISTS "${MARIADB_USER}"@"localhost" IDENTIFIED BY "$db_password";
+	GRANT ALL PRIVILEGES ON \`${MARIADB_DATABASE}\`.* TO "${MARIADB_USER}"@"localhost";
 	CREATE USER IF NOT EXISTS "${MARIADB_USER}"@"%" IDENTIFIED BY "$db_password";
 	GRANT ALL PRIVILEGES ON \`${MARIADB_DATABASE}\`.* TO "${MARIADB_USER}"@"%";
 	FLUSH PRIVILEGES;
